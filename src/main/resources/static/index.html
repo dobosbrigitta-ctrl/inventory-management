@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Inventory Management Dashboard</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background-color: #f4f6f9; display: flex; gap: 30px; }
+        .form-section { flex: 1; max-width: 400px; background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); height: fit-content; }
+        .table-section { flex: 2; background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        h2 { color: #333; margin-top: 0; margin-bottom: 20px; border-bottom: 2px solid #0078d4; padding-bottom: 10px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; color: #555; }
+        input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        button { background-color: #0078d4; color: white; padding: 12px; border: none; border-radius: 4px; cursor: pointer; width: 100%; font-size: 16px; font-weight: bold; }
+        button:hover { background-color: #005a9e; }
+        .table-header-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #0078d4; padding-bottom: 10px; }
+        .table-header-container h2 { border: none; margin: 0; padding: 0; }
+        .toggle-btn { background-color: #2b88d8; padding: 8px 16px; font-size: 14px; width: auto; }
+        .toggle-btn.active { background-color: #107c41; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e0e0e0; }
+        th { background-color: #f8f9fa; color: #333; font-weight: bold; cursor: pointer; user-select: none; }
+        th:hover { background-color: #eaeaea; }
+        tr:hover { background-color: #f1f5f9; }
+        .sort-icon { font-size: 12px; margin-left: 5px; color: #888; }
+
+        /* Class to hide the expiration column dynamically */
+        .hide-col { display: none; }
+    </style>
+</head>
+<body>
+
+<div class="form-section">
+    <h2>Add Product</h2>
+    <form id="productForm">
+        <div class="form-group">
+            <label>Product Name:</label>
+            <input type="text" id="name" placeholder="e.g. Olive Oil" required>
+        </div>
+        <div class="form-group">
+            <label>Barcode:</label>
+            <input type="text" id="barcode" placeholder="e.g. 5991234500067" required>
+        </div>
+        <div class="form-group">
+            <label>Expiration Date:</label>
+            <input type="text" id="expirationDate" placeholder="yyyy-mm-dd" maxlength="10" required>
+        </div>
+        <div class="form-group">
+            <label>Quantity:</label>
+            <input type="number" id="quantity" placeholder="e.g. 40" min="1" required>
+        </div>
+        <button type="submit">Save Product</button>
+    </form>
+</div>
+
+<div class="table-section">
+    <div class="table-header-container">
+        <h2>Current Inventory Stock</h2>
+        <button id="viewToggleBtn" class="toggle-btn" onclick="toggleView()">Group by Name: OFF</button>
+    </div>
+    <table>
+        <thead>
+        <tr>
+            <th onclick="sortInventory('name')">Product Name <span id="name-sort" class="sort-icon">↕</span></th>
+            <th onclick="sortInventory('barcode')">Barcode <span id="barcode-sort" class="sort-icon">↕</span></th>
+            <th id="th-expiration">Expiration Date</th>
+            <th>Quantity</th>
+        </tr>
+        </thead>
+        <tbody id="inventoryTableBody">
+        </tbody>
+    </table>
+</div>
+
+<script>
+    let rawProducts = [];
+    let displayProducts = [];
+    let isGrouped = false;
+    let sortDirections = { name: true, barcode: true };
+
+    document.addEventListener("DOMContentLoaded", fetchInventory);
+
+    document.getElementById('expirationDate').addEventListener('input', function (e) {
+        let input = e.target.value.replace(/\D/g, '');
+        if (input.length > 4 && input.length <= 6) {
+            input = input.slice(0, 4) + '-' + input.slice(4);
+        } else if (input.length > 6) {
+            input = input.slice(0, 4) + '-' + input.slice(4, 6) + '-' + input.slice(6, 8);
+        }
+        e.target.value = input;
+    });
+
+    function fetchInventory() {
+        fetch('/products')
+            .then(response => response.json())
+            .then(products => {
+                rawProducts = products;
+                processAndRender();
+            });
+    }
+
+    function toggleView() {
+        isGrouped = !isGrouped;
+        const btn = document.getElementById('viewToggleBtn');
+        const thExpiration = document.getElementById('th-expiration');
+
+        if (isGrouped) {
+            btn.innerText = "Group by Name: ON";
+            btn.classList.add('active');
+            thExpiration.classList.add('hide-col'); // Hide header
+        } else {
+            btn.innerText = "Group by Name: OFF";
+            btn.classList.remove('active');
+            thExpiration.classList.remove('hide-col'); // Show header
+        }
+        processAndRender();
+    }
+
+    function processAndRender() {
+        if (isGrouped) {
+            const groups = {};
+            rawProducts.forEach(p => {
+                const key = p.name.toLowerCase() + "_" + p.barcode;
+                if (!groups[key]) {
+                    groups[key] = { ...p };
+                } else {
+                    groups[key].quantity += p.quantity;
+                }
+            });
+            displayProducts = Object.values(groups);
+        } else {
+            displayProducts = JSON.parse(JSON.stringify(rawProducts));
+        }
+        renderTable(displayProducts);
+    }
+
+    function renderTable(products) {
+        const tbody = document.getElementById('inventoryTableBody');
+        tbody.innerHTML = '';
+        products.forEach(product => {
+            const row = `<tr>
+                <td>${product.name}</td>
+                <td>${product.barcode}</td>
+                <td class="${isGrouped ? 'hide-col' : ''}">${product.expirationDate || ''}</td>
+                <td>${product.quantity}</td>
+            </tr>`;
+            tbody.innerHTML += row;
+        });
+    }
+
+    function sortInventory(column) {
+        sortDirections[column] = !sortDirections[column];
+
+        document.getElementById('name-sort').innerText = '↕';
+        document.getElementById('barcode-sort').innerText = '↕';
+        document.getElementById(`${column}-sort`).innerText = sortDirections[column] ? '▲' : '▼';
+
+        displayProducts.sort((a, b) => {
+            let valA = a[column].toUpperCase();
+            let valB = b[column].toUpperCase();
+
+            if (valA < valB) return sortDirections[column] ? -1 : 1;
+            if (valA > valB) return sortDirections[column] ? 1 : -1;
+            return 0;
+        });
+
+        renderTable(displayProducts);
+    }
+
+    document.getElementById('productForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const name = document.getElementById('name').value;
+        const barcode = document.getElementById('barcode').value;
+        const expirationDate = document.getElementById('expirationDate').value;
+        const quantity = document.getElementById('quantity').value;
+
+        fetch(`/products/add?name=${encodeURIComponent(name)}&barcode=${barcode}&expirationDate=${expirationDate}&quantity=${quantity}`)
+            .then(() => {
+                document.getElementById('productForm').reset();
+                fetchInventory();
+            });
+    });
+</script>
+
+</body>
+</html>
+
+
+
+
+
+
+
