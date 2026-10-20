@@ -18,7 +18,20 @@ public class Product {
     private LocalDate expirationDate;
     private int quantity;
 
+    private double originalPrice;
+    private double currentPrice;
+    private int discountPercent = 0;
+
     public Product() {
+    }
+
+    public Product(String name, String barcode, LocalDate expirationDate, int quantity, double originalPrice) {
+        this.name = name;
+        this.barcode = barcode;
+        this.expirationDate = expirationDate;
+        this.quantity = quantity;
+        this.originalPrice = originalPrice;
+        this.currentPrice = originalPrice;
     }
 
     public Product(String name, String barcode, LocalDate expirationDate, int quantity) {
@@ -26,6 +39,42 @@ public class Product {
         this.barcode = barcode;
         this.expirationDate = expirationDate;
         this.quantity = quantity;
+        this.originalPrice = 0.0;
+        this.currentPrice = 0.0;
+    }
+
+    public void applyDiscount(int percent) {
+        this.discountPercent = percent;
+        this.currentPrice = this.originalPrice * (1.0 - (percent / 100.0));
+    }
+
+    public void resetPrice() {
+        this.discountPercent = 0;
+        this.currentPrice = this.originalPrice;
+    }
+
+    public double getOriginalPrice() {
+        return originalPrice;
+    }
+
+    public void setOriginalPrice(double originalPrice) {
+        this.originalPrice = originalPrice;
+    }
+
+    public double getCurrentPrice() {
+        return currentPrice;
+    }
+
+    public void setCurrentPrice(double currentPrice) {
+        this.currentPrice = currentPrice;
+    }
+
+    public int getDiscountPercent() {
+        return discountPercent;
+    }
+
+    public void setDiscountPercent(int discountPercent) {
+        this.discountPercent = discountPercent;
     }
 
     public Long getId() {
