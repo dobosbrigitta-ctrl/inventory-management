@@ -1,54 +1,50 @@
 package org.example;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import java.time.LocalDate;
-import java.util.List;
+
 
 @Component
 public class DataInitializer implements CommandLineRunner {
 
-    private final ProductRepository productRepository;
-    private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
-    public DataInitializer(ProductRepository productRepository, UserRepository userRepository, PasswordEncoder passwordEncoder) {
-        this.productRepository = productRepository;
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-    }
+    @Autowired
+    private ProductRepository productRepository;
+
+    @Autowired
+    private FoodBatchRepository foodBatchRepository;
 
     @Override
     public void run(String... args) throws Exception {
-        if (productRepository.count() == 0) {
-            List<Product> initialProducts = List.of(
-                    new Product("Milk 1.5%", "5991234500012", LocalDate.of(2026, 11, 15), 120),
-                    new Product("Gouda cheese", "5991234500029", LocalDate.of(2027, 2, 20), 45),
-                    new Product("Chocolate", "5991234500036", LocalDate.of(2026, 10, 12), 30),
-                    new Product("Butter", "5991234500043", LocalDate.of(2026, 12, 5), 80),
-                    new Product("Bubblegum", "5991234500050", LocalDate.of(2026, 10, 10), 200)
-            );
-            productRepository.saveAll(initialProducts);
-        }
+        Product product1 = new Product();
+        product1.setName("Milk");
+        product1.setBarcode("59912345");
+        product1.setDiscountPercent(0.0);
+        productRepository.save(product1);
 
-        if (userRepository.count() == 0) {
-            UserEntity admin = new UserEntity();
-            admin.setUsername("admin");
-            admin.setPassword(passwordEncoder.encode("admin123"));
-            admin.setRole("ADMIN");
+        FoodBatch batch1 = new FoodBatch();
+        batch1.setBatchNumber("BATCH-INITIAL-01");
+        batch1.setQuantity(10.0);
+        batch1.setExpiryDate(LocalDate.now().plusDays(5));
+        batch1.setProduct(product1);
+        foodBatchRepository.save(batch1);
 
-            UserEntity manager = new UserEntity();
-            manager.setUsername("manager");
-            manager.setPassword(passwordEncoder.encode("manager123"));
-            manager.setRole("MANAGER");
+        Product product2 = new Product();
+        product2.setName("Gouda cheese");
+        product2.setBarcode("59967890");
+        product2.setDiscountPercent(0.0);
+        productRepository.save(product2);
 
-            UserEntity user = new UserEntity();
-            user.setUsername("user");
-            user.setPassword(passwordEncoder.encode("user123"));
-            user.setRole("USER");
-
-            userRepository.saveAll(List.of(admin, manager, user));
-        }
+        FoodBatch batch2 = new FoodBatch();
+        batch2.setBatchNumber("BATCH-INITIAL-02");
+        batch2.setQuantity(5.0);
+        batch2.setExpiryDate(LocalDate.now().plusDays(2));
+        batch2.setProduct(product2);
+        foodBatchRepository.save(batch2);
     }
 }

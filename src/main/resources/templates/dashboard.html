@@ -4,56 +4,127 @@
     <meta charset="UTF-8">
     <title>Inventory Management System</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f9f9f9; color: #333; }
-        .header { display: flex; justify-content: space-between; align-items: center; background-color: #fff; padding: 15px 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 20px; }
-        .header h1 { margin: 0; font-size: 24px; }
-        .nav-buttons button, .header-actions button { background-color: #007bff; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-size: 14px; margin-right: 5px; }
-        .nav-buttons button:hover, .header-actions button:hover { background-color: #0056b3; }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 20px;
+            background-color: #1e222b;
+            color: #e1e6ed;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #282c34;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            margin-bottom: 20px;
+        }
+        .header h1 { margin: 0; font-size: 24px; color: #61afef; }
+
+        .nav-buttons button, .header-actions button {
+            background-color: #4b5263;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 5px;
+            transition: background 0.2s;
+        }
+        .nav-buttons button:hover, .header-actions button:hover { background-color: #5c6370; }
         .header-actions form { display: inline; }
-        .header-actions .logout-btn { background-color: #dc3545; }
-        .header-actions .logout-btn:hover { background-color: #c82333; }
-        .tabs { display: flex; margin-bottom: 20px; border-bottom: 2px solid #ccc; }
-        .tab-link { background: none; border: none; padding: 10px 20px; font-size: 16px; cursor: pointer; opacity: 0.6; }
-        .tab-link.active { border-bottom: 3px solid #007bff; opacity: 1; font-weight: bold; }
-        .tab-content { display: none; background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .header-actions .logout-btn { background-color: #e06c75; }
+        .header-actions .logout-btn:hover { background-color: #be5046; }
+
+        .tabs { display: flex; margin-bottom: 20px; border-bottom: 2px solid #3e4451; }
+        .tab-link { background: none; border: none; padding: 10px 20px; font-size: 16px; cursor: pointer; color: #abb2bf; opacity: 0.8; }
+        .tab-link.active { border-bottom: 3px solid #61afef; opacity: 1; font-weight: bold; color: #61afef; }
+
+        .tab-content {
+            display: none;
+            background-color: #282c34;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
         .tab-content.active { display: block; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { border: 1px solid #dddddd; text-align: left; padding: 12px; }
-        th { background-color: #f2f2f2; }
-        tr:nth-child(even) { background-color: #f9f9f9; }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; background-color: #21252b; border-radius: 6px; overflow: hidden; }
+        th, td { border: 1px solid #282c34; text-align: left; padding: 12px; vertical-align: middle; }
+        th { background-color: #282c34; color: #98c379; font-weight: bold; }
+        tr:nth-child(even) { background-color: #242831; }
+        tr:hover { background-color: #2c313c; }
+
+        table input[type="text"], table input[type="number"] {
+            padding: 6px;
+            border: 1px solid #3e4451;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 14px;
+            background-color: #1e222b;
+            color: #e1e6ed;
+        }
+        table input[type="text"]:focus, table input[type="number"]:focus {
+            border-color: #61afef;
+            outline: none;
+        }
+        table button {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 13px;
+            transition: background 0.2s;
+        }
+        table button[type="submit"]:not([style*="background-color"]) {
+            background-color: #98c379;
+            color: #1e222b;
+        }
+        table button[type="submit"]:not([style*="background-color"]):hover {
+            background-color: #a3d487;
+        }
+
         .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; }
-        .form-group input { width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; background-color: #fff; }
-        .submit-btn { background-color: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-size: 16px; }
-        .submit-btn:hover { background-color: #218838; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; color: #abb2bf; }
+        .form-group input { width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #3e4451; border-radius: 4px; background-color: #1e222b; color: #e1e6ed; }
+
+        .submit-btn { background-color: #98c379; color: #1e222b; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-size: 16px; font-weight: bold; }
+        .submit-btn:hover { background-color: #a3d487; }
+
         .analytics-container { display: flex; flex-direction: column; gap: 20px; }
         .kpi-row { display: flex; gap: 15px; }
-        .kpi-card { flex: 1; background-color: #fff; padding: 20px; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-top: 4px solid #007bff; }
-        .kpi-card.critical { border-top-color: #dc3545; }
-        .kpi-card h3 { margin: 0 0 10px 0; font-size: 14px; color: #666; text-transform: uppercase; }
-        .kpi-card .value { font-size: 28px; font-weight: bold; color: #111; }
-        .chart-box { background-color: #fff; padding: 20px; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-        .analytics-card { background-color: #e3f2fd; padding: 15px; border-radius: 6px; border-left: 5px solid #007bff; }
+        .kpi-card { flex: 1; background-color: #282c34; padding: 20px; border-radius: 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.2); border-top: 4px solid #61afef; }
+        .kpi-card.critical { border-top-color: #e06c75; }
+        .kpi-card h3 { margin: 0 0 10px 0; font-size: 14px; color: #abb2bf; text-transform: uppercase; }
+        .kpi-card .value { font-size: 28px; font-weight: bold; color: #e1e6ed; }
 
-        .css-chart { display: flex; flex-direction: column; gap: 10px; margin-top: 15px; background: #fafafa; padding: 15px; border-radius: 4px; }
+        .chart-box { background-color: #282c34; padding: 20px; border-radius: 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
+        .analytics-card { background-color: #2c313c; padding: 15px; border-radius: 6px; border-left: 5px solid #61afef; color: #abb2bf; }
+
+        .css-chart { display: flex; flex-direction: column; gap: 10px; margin-top: 15px; background: #21252b; padding: 15px; border-radius: 4px; }
         .chart-row { display: flex; align-items: center; gap: 10px; }
-        .chart-label { width: 200px; font-size: 13px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; }
-        .chart-bar-wrapper { flex-grow: 1; background: #eee; border-radius: 4px; height: 24px; position: relative; }
-        .chart-bar { height: 100%; border-radius: 4px; background-color: #007bff; transition: width 0.5s ease; }
-        .chart-bar.low { background-color: #dc3545; }
-        .chart-value { position: absolute; right: 8px; top: 3px; font-size: 12px; font-weight: bold; color: #333; }
+        .chart-label { width: 200px; font-size: 13px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; color: #abb2bf; }
+        .chart-bar-wrapper { flex-grow: 1; background: #282c34; border-radius: 4px; height: 24px; position: relative; }
+        .chart-bar { height: 100%; border-radius: 4px; background-color: #61afef; transition: width 0.5s ease; }
+        .chart-bar.low { background-color: #e06c75; }
+        .chart-value { position: absolute; right: 8px; top: 3px; font-size: 12px; font-weight: bold; color: #e1e6ed; }
 
         .low-stock {
             animation: blinker 1.5s linear infinite;
-            background-color: #f8d7da !important;
-            color: #721c24;
+            background-color: #4b3236 !important;
+            color: #f8a7ae;
             font-weight: bold;
         }
         @keyframes blinker {
-            50% { opacity: 0.4; }
+            50% { opacity: 0.5; }
         }
     </style>
 </head>
+
+
 <body>
 
 <div class="header">
@@ -74,24 +145,51 @@
 
 <div id="stock" class="tab-content active">
     <h2>Current Stock Level</h2>
-    <table>
+    <table border="1" style="width: 100%; border-collapse: collapse; text-align: left;">
         <thead>
         <tr>
+            <th>Batch ID</th>
             <th>Product Name</th>
             <th>Barcode</th>
-            <th>Expiration Date</th>
+            <th>Batch Number</th>
             <th>Quantity</th>
+            <th>Expiration Date</th>
+            <th>Discount %</th>
+            <th>Actions</th>
+            <th>Stock Out (FEFO)</th>
         </tr>
         </thead>
         <tbody>
-        <tr th:each="product : ${products}" th:classappend="${product.quantity < 5} ? 'low-stock' : ''">
-            <td th:text="${product.name}">Product</td>
-            <td th:text="${product.barcode}">000000</td>
-            <td th:text="${product.expirationDate}">2026-10-20</td>
-            <td th:text="${product.quantity}">0</td>
+        <tr th:each="batch : ${batches}" th:classappend="${batch.quantity < 5} ? 'low-stock' : ''">
+            <td th:text="${batch.id}">1</td>
+            <form th:action="@{/dashboard/batches/{id}/update(id=${batch.id})}" method="post" style="display: contents;">
+                <td>
+                    <input type="text" name="productName" th:value="${batch.product != null ? batch.product.name : ''}" required style="width: 130px;"/>
+                </td>
+                <td>
+                    <input type="text" name="barcode" th:value="${batch.product != null ? batch.product.barcode : ''}" required style="width: 100px;"/>
+                </td>
+                <td th:text="${batch.batchNumber}">BATCH-000</td>
+                <td>
+                    <input type="number" step="0.1" name="newQuantity" th:value="${batch.quantity}" required style="width: 55px;"/>
+                </td>
+                <td th:text="${batch.expiryDate}">2026-10-20</td>
+                <td th:text="${batch.product != null ? batch.product.discountPercent + '%' : '0%'}">0%</td>
+                <td>
+                    <button type="submit">Update</button>
+                </td>
+            </form>
+            <td>
+                <form th:if="${batch.product != null}" th:action="@{/api/products/{id}/checkout(id=${batch.product.id})}" method="post" style="margin: 0; white-space: nowrap;">
+                    <input type="number" step="0.1" name="requestedQuantity" placeholder="Amount" required style="width: 55px;"/>
+                    <button type="submit" style="background-color: #d9534f; color: white; border: none; padding: 4px 8px; cursor: pointer;">Issue</button>
+                </form>
+            </td>
         </tr>
         </tbody>
     </table>
+
+
 </div>
 
 <div id="add-product" class="tab-content">
@@ -124,15 +222,15 @@
         <div class="kpi-row">
             <div class="kpi-card">
                 <h3>Total Product Types</h3>
-                <div class="value" th:text="${products.size()}">0</div>
+                <div class="value" th:text="${batches.size()}">0</div>
             </div>
             <div class="kpi-card">
                 <h3>Total Items in Stock</h3>
-                <div class="value" th:text="${#aggregates.sum(products.![quantity])}">0</div>
+                <div class="value" th:text="${#aggregates.sum(batches.![quantity])}">0</div>
             </div>
             <div class="kpi-card critical">
                 <h3>Critical Low Stock</h3>
-                <div class="value" th:text="${products.?[quantity < 5].size()}">0</div>
+                <div class="value" th:text="${batches.?[quantity < 5].size()}">0</div>
             </div>
         </div>
 
@@ -140,7 +238,8 @@
             <h3>Stock Levels by Product</h3>
             <div class="css-chart">
                 <div class="chart-row" th:each="product : ${products}">
-                    <div class="chart-label" th:text="${product.name}">Product</div>
+                    <td th:text="${product.product != null ? product.product.name : 'Unknown'}">Product Name</td>
+
                     <div class="chart-bar-wrapper">
                         <div class="chart-bar"
                              th:classappend="${product.quantity < 5} ? 'low' : ''"

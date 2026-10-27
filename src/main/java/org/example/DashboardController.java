@@ -8,25 +8,58 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
+import java.util.List;
 
 @Controller
 public class DashboardController {
 
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
+    private final FoodBatchRepository foodBatchRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public DashboardController(UserRepository userRepository, ProductRepository productRepository, PasswordEncoder passwordEncoder) {
+    public DashboardController(UserRepository userRepository,
+                               ProductRepository productRepository,
+                               FoodBatchRepository foodBatchRepository,
+                               PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.productRepository = productRepository;
+        this.foodBatchRepository = foodBatchRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
     @GetMapping("/")
     public String showDashboard(Model model) {
-        model.addAttribute("products", productRepository.findAll());
+        List<FoodBatch> currentBatches = foodBatchRepository.findAll();
+        model.addAttribute("batches", currentBatches);
+        model.addAttribute("products", currentBatches);
         return "dashboard";
+    }
+
+    @PostMapping("/dashboard/batches/{id}/update")
+    @Transactional
+    public String updateBatchFromWeb(
+            @PathVariable Long id,
+            @RequestParam("newQuantity") double newQuantity,
+            @RequestParam("productName") String productName,
+            @RequestParam("barcode") String barcode) {
+
+        if (newQuantity >= 0) {
+            foodBatchRepository.findById(id).ifPresent(batch -> {
+                batch.setQuantity(newQuantity);
+
+                if (batch.getProduct() != null) {
+                    batch.getProduct().setName(productName);
+                    batch.getProduct().setBarcode(barcode);
+                    productRepository.save(batch.getProduct());
+                }
+
+                foodBatchRepository.save(batch);
+            });
+        }
+        return "redirect:/";
     }
 
     @GetMapping("/change-password")
