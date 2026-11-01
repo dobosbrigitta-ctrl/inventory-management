@@ -58,7 +58,19 @@ public class ProductController {
                     return ResponseEntity.ok(updatedProduct);
                 })
                 .orElse(ResponseEntity.notFound().build());
+
+
+    }@DeleteMapping("/{id}")
+    @org.springframework.transaction.annotation.Transactional
+    public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
+        return productRepository.findById(id)
+                .map(product -> {
+                    productRepository.delete(product);
+                    return ResponseEntity.noContent().<Void>build();
+                })
+                .orElse(ResponseEntity.notFound().build());
     }
+
     @PatchMapping("/batches/{batchId}")
     public ResponseEntity<FoodBatch> updateBatchQuantity(@PathVariable Long batchId, @RequestParam double newQuantity) {
         if (newQuantity < 0) {

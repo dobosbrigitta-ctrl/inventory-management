@@ -2,6 +2,7 @@ package org.example;
 
 import jakarta.persistence.*;
 import java.util.List;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 public class Product {
@@ -13,7 +14,9 @@ public class Product {
     private String barcode;
     private double discountPercent;
 
+
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<FoodBatch> batches;
 
     public Product() {
@@ -51,6 +54,7 @@ public class Product {
         this.discountPercent = discountPercent;
     }
 
+    @JsonIgnore
     public List<FoodBatch> getBatches() {
         return batches;
     }
