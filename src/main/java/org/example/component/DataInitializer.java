@@ -1,5 +1,9 @@
-package org.example;
+package org.example.component;
 
+import org.example.entity.Product;
+import org.example.entity.FoodBatch;
+import org.example.repository.FoodBatchRepository;
+import org.example.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
