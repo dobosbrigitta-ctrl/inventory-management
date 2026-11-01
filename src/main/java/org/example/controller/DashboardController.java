@@ -1,5 +1,10 @@
-package org.example;
+package org.example.controller;
 
+import org.example.entity.FoodBatch;
+import org.example.entity.UserEntity;
+import org.example.repository.FoodBatchRepository;
+import org.example.repository.ProductRepository;
+import org.example.repository.UserRepository;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;

@@ -1,5 +1,10 @@
-package org.example;
+package org.example.controller;
 
+import org.example.entity.FoodBatch;
+import org.example.entity.Product;
+import org.example.repository.ProductRepository;
+import org.example.model.ProductRequest;
+import org.example.repository.FoodBatchRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
