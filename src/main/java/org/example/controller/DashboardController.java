@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import java.util.List;
+import java.math.BigDecimal;
 
 @Controller
 public class DashboardController {
@@ -47,11 +48,11 @@ public class DashboardController {
     @Transactional
     public String updateBatchFromWeb(
             @PathVariable Long id,
-            @RequestParam("newQuantity") double newQuantity,
+            @RequestParam("newQuantity") BigDecimal newQuantity,
             @RequestParam("productName") String productName,
             @RequestParam("barcode") String barcode) {
 
-        if (newQuantity >= 0) {
+        if (newQuantity != null && newQuantity.compareTo(BigDecimal.ZERO) >= 0) {
             foodBatchRepository.findById(id).ifPresent(batch -> {
                 batch.setQuantity(newQuantity);
 

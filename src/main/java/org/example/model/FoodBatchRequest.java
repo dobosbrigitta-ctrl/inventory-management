@@ -1,17 +1,19 @@
+
 package org.example.model;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public class FoodBatchRequest {
     private String name;
     private String barcode;
-    private double quantity;
+    private BigDecimal quantity;
     private LocalDate expirationDate;
 
     public FoodBatchRequest() {
     }
 
-    public FoodBatchRequest(String name, String barcode, double quantity, LocalDate expirationDate) {
+    public FoodBatchRequest(String name, String barcode, BigDecimal quantity, LocalDate expirationDate) {
         this.name = name;
         this.barcode = barcode;
         this.quantity = quantity;
@@ -34,11 +36,11 @@ public class FoodBatchRequest {
         this.barcode = barcode;
     }
 
-    public double getQuantity() {
+    public BigDecimal getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(double quantity) {
+    public void setQuantity(BigDecimal quantity) {
         this.quantity = quantity;
     }
 
@@ -50,3 +52,4 @@ public class FoodBatchRequest {
         this.expirationDate = expirationDate;
     }
 }
+
