@@ -1,5 +1,6 @@
+
 <!DOCTYPE html>
-<html xmlns:th="http://thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Inventory Management System</title>
@@ -10,6 +11,7 @@
             background-color: #1e222b;
             color: #e1e6ed;
         }
+
         .header {
             display: flex;
             justify-content: space-between;
@@ -20,7 +22,12 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.3);
             margin-bottom: 20px;
         }
-        .header h1 { margin: 0; font-size: 24px; color: #61afef; }
+
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+            color: #61afef;
+        }
 
         .nav-buttons button, .header-actions button {
             background-color: #4b5263;
@@ -33,14 +40,45 @@
             margin-right: 5px;
             transition: background 0.2s;
         }
-        .nav-buttons button:hover, .header-actions button:hover { background-color: #5c6370; }
-        .header-actions form { display: inline; }
-        .header-actions .logout-btn { background-color: #e06c75; }
-        .header-actions .logout-btn:hover { background-color: #be5046; }
 
-        .tabs { display: flex; margin-bottom: 20px; border-bottom: 2px solid #3e4451; }
-        .tab-link { background: none; border: none; padding: 10px 20px; font-size: 16px; cursor: pointer; color: #abb2bf; opacity: 0.8; }
-        .tab-link.active { border-bottom: 3px solid #61afef; opacity: 1; font-weight: bold; color: #61afef; }
+        .nav-buttons button:hover, .header-actions button:hover {
+            background-color: #5c6370;
+        }
+
+        .header-actions form {
+            display: inline;
+        }
+
+        .header-actions .logout-btn {
+            background-color: #e06c75;
+        }
+
+        .header-actions .logout-btn:hover {
+            background-color: #be5046;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #3e4451;
+        }
+
+        .tab-link {
+            background: none;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            color: #abb2bf;
+            opacity: 0.8;
+        }
+
+        .tab-link.active {
+            border-bottom: 3px solid #61afef;
+            opacity: 1;
+            font-weight: bold;
+            color: #61afef;
+        }
 
         .tab-content {
             display: none;
@@ -49,13 +87,40 @@
             border-radius: 8px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
-        .tab-content.active { display: block; }
 
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; background-color: #21252b; border-radius: 6px; overflow: hidden; }
-        th, td { border: 1px solid #282c34; text-align: left; padding: 12px; vertical-align: middle; }
-        th { background-color: #282c34; color: #98c379; font-weight: bold; }
-        tr:nth-child(even) { background-color: #242831; }
-        tr:hover { background-color: #2c313c; }
+        .tab-content.active {
+            display: block;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            background-color: #21252b;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        th, td {
+            border: 1px solid #282c34;
+            text-align: left;
+            padding: 12px;
+            vertical-align: middle;
+        }
+
+        th {
+            background-color: #282c34;
+            color: #98c379;
+            font-weight: bold;
+        }
+
+        tr:nth-child(even) {
+            background-color: #242831;
+        }
+
+        tr:hover {
+            background-color: #2c313c;
+        }
 
         table input[type="text"], table input[type="number"] {
             padding: 6px;
@@ -66,10 +131,12 @@
             background-color: #1e222b;
             color: #e1e6ed;
         }
+
         table input[type="text"]:focus, table input[type="number"]:focus {
             border-color: #61afef;
             outline: none;
         }
+
         table button {
             padding: 6px 12px;
             border: none;
@@ -79,38 +146,156 @@
             font-size: 13px;
             transition: background 0.2s;
         }
+
         table button[type="submit"]:not([style*="background-color"]) {
             background-color: #98c379;
             color: #1e222b;
         }
+
         table button[type="submit"]:not([style*="background-color"]):hover {
             background-color: #a3d487;
         }
 
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; color: #abb2bf; }
-        .form-group input { width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #3e4451; border-radius: 4px; background-color: #1e222b; color: #e1e6ed; }
+        .form-group {
+            margin-bottom: 15px;
+        }
 
-        .submit-btn { background-color: #98c379; color: #1e222b; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-size: 16px; font-weight: bold; }
-        .submit-btn:hover { background-color: #a3d487; }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #abb2bf;
+        }
 
-        .analytics-container { display: flex; flex-direction: column; gap: 20px; }
-        .kpi-row { display: flex; gap: 15px; }
-        .kpi-card { flex: 1; background-color: #282c34; padding: 20px; border-radius: 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.2); border-top: 4px solid #61afef; }
-        .kpi-card.critical { border-top-color: #e06c75; }
-        .kpi-card h3 { margin: 0 0 10px 0; font-size: 14px; color: #abb2bf; text-transform: uppercase; }
-        .kpi-card .value { font-size: 28px; font-weight: bold; color: #e1e6ed; }
+        .form-group input {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            border: 1px solid #3e4451;
+            border-radius: 4px;
+            background-color: #1e222b;
+            color: #e1e6ed;
+        }
 
-        .chart-box { background-color: #282c34; padding: 20px; border-radius: 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
-        .analytics-card { background-color: #2c313c; padding: 15px; border-radius: 6px; border-left: 5px solid #61afef; color: #abb2bf; }
+        .submit-btn {
+            background-color: #98c379;
+            color: #1e222b;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+        }
 
-        .css-chart { display: flex; flex-direction: column; gap: 10px; margin-top: 15px; background: #21252b; padding: 15px; border-radius: 4px; }
-        .chart-row { display: flex; align-items: center; gap: 10px; }
-        .chart-label { width: 200px; font-size: 13px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; color: #abb2bf; }
-        .chart-bar-wrapper { flex-grow: 1; background: #282c34; border-radius: 4px; height: 24px; position: relative; }
-        .chart-bar { height: 100%; border-radius: 4px; background-color: #61afef; transition: width 0.5s ease; }
-        .chart-bar.low { background-color: #e06c75; }
-        .chart-value { position: absolute; right: 8px; top: 3px; font-size: 12px; font-weight: bold; color: #e1e6ed; }
+        .submit-btn:hover {
+            background-color: #a3d487;
+        }
+
+        .analytics-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .kpi-row {
+            display: flex;
+            gap: 15px;
+        }
+
+        .kpi-card {
+            flex: 1;
+            background-color: #282c34;
+            padding: 20px;
+            border-radius: 6px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+            border-top: 4px solid #61afef;
+        }
+
+        .kpi-card.critical {
+            border-top-color: #e06c75;
+        }
+
+        .kpi-card h3 {
+            margin: 0 0 10px 0;
+            font-size: 14px;
+            color: #abb2bf;
+            text-transform: uppercase;
+        }
+
+        .kpi-card .value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #e1e6ed;
+        }
+
+        .chart-box {
+            background-color: #282c34;
+            padding: 20px;
+            border-radius: 6px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+
+        .analytics-card {
+            background-color: #2c313c;
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 5px solid #61afef;
+            color: #abb2bf;
+        }
+
+        .css-chart {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 15px;
+            background: #21252b;
+            padding: 15px;
+            border-radius: 4px;
+        }
+
+        .chart-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .chart-label {
+            width: 200px;
+            font-size: 13px;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
+            color: #abb2bf;
+        }
+
+        .chart-bar-wrapper {
+            flex-grow: 1;
+            background: #282c34;
+            border-radius: 4px;
+            height: 24px;
+            position: relative;
+        }
+
+        .chart-bar {
+            height: 100%;
+            border-radius: 4px;
+            background-color: #61afef;
+            transition: width 0.5s ease;
+        }
+
+        .chart-bar.low {
+            background-color: #e06c75;
+        }
+
+        .chart-value {
+            position: absolute;
+            right: 8px;
+            top: 3px;
+            font-size: 12px;
+            font-weight: bold;
+            color: #e1e6ed;
+        }
 
         .low-stock {
             animation: blinker 1.5s linear infinite;
@@ -118,19 +303,32 @@
             color: #f8a7ae;
             font-weight: bold;
         }
+
+        .delete-btn {
+            background-color: #e06c75;
+            color: white;
+        }
+
+        .delete-btn:hover {
+            background-color: #be5046;
+        }
+
         @keyframes blinker {
-            50% { opacity: 0.5; }
+            50% {
+                opacity: 0.5;
+            }
         }
     </style>
 </head>
-
 
 <body>
 
 <div class="header">
     <h1>Inventory Management System</h1>
     <div class="header-actions">
-        <a th:href="@{/change-password}"><button type="button">Change Password</button></a>
+        <a th:href="@{/change-password}">
+            <button type="button">Change Password</button>
+        </a>
         <form th:action="@{/logout}" method="post">
             <button type="submit" class="logout-btn">Log Out</button>
         </form>
@@ -145,7 +343,7 @@
 
 <div id="stock" class="tab-content active">
     <h2>Current Stock Level</h2>
-    <table border="1" style="width: 100%; border-collapse: collapse; text-align: left;">
+    <table>
         <thead>
         <tr>
             <th>Batch ID</th>
@@ -158,46 +356,90 @@
             <th>Purchase Price</th>
             <th>Discount %</th>
             <th>Actions</th>
+            <th>Delete</th>
             <th>Stock Out (FEFO)</th>
         </tr>
         </thead>
+
         <tbody>
         <tr th:each="batch : ${batches}" th:classappend="${batch.quantity < 5} ? 'low-stock' : ''">
             <td th:text="${batch.id}">1</td>
-            <form th:action="@{/dashboard/batches/{id}/update(id=${batch.id})}" method="post" style="display: contents;">
-                <td>
-                    <input type="text" name="productName" th:value="${batch.product != null ? batch.product.name : ''}" required style="width: 130px;"/>
-                </td>
-                <td>
-                    <input type="text" name="barcode" th:value="${batch.product != null ? batch.product.barcode : ''}" required style="width: 100px;"/>
-                </td>
-                <td th:text="${batch.batchNumber}">BATCH-000</td>
-                <td>
-                    <input type="number" step="0.1" name="newQuantity" th:value="${batch.quantity}" required style="width: 55px;"/>
-                </td>
-                <td th:text="${batch.expiryDate}">2026-10-20</td>
-                <td>
-                    <input type="text" name="sellingPrice" th:value="${batch.product != null ? batch.product.sellingPrice : ''}" required style="width: 100px;"/>
-                </td>
-                <td>
-                    <input type="text" name="purchasePrice" th:value="${batch.purchasePrice != null ? batch.purchasePrice : ''}" required style="width: 100px;"/>
-                </td>
-                <td th:text="${batch.product != null ? batch.product.discountPercent + '%' : '0%'}">0%</td>
-                <td>
-                    <button type="submit">Update</button>
-                </td>
-            </form>
+
             <td>
-                <form th:if="${batch.product != null}" th:action="@{/api/products/{id}/checkout(id=${batch.product.id})}" method="post" style="margin: 0; white-space: nowrap;">
-                    <input type="number" step="0.1" name="requestedQuantity" placeholder="Amount" required style="width: 55px;"/>
-                    <button type="submit" style="background-color: #d9534f; color: white; border: none; padding: 4px 8px; cursor: pointer;">Issue</button>
+                <input type="text" name="productName"
+                       th:value="${batch.product != null ? batch.product.name : ''}"
+                       th:attr="form=${'update-batch-' + batch.id}"
+                       required style="width: 130px;"/>
+            </td>
+
+            <td>
+                <input type="text" name="barcode"
+                       th:value="${batch.product != null ? batch.product.barcode : ''}"
+                       th:attr="form=${'update-batch-' + batch.id}"
+                       required style="width: 100px;"/>
+            </td>
+
+            <td th:text="${batch.batchNumber}">BATCH-000</td>
+
+            <td>
+                <input type="number" step="0.1" name="newQuantity"
+                       th:value="${batch.quantity}"
+                       th:attr="form=${'update-batch-' + batch.id}"
+                       required style="width: 55px;"/>
+            </td>
+
+            <td th:text="${batch.expiryDate}">2026-10-20</td>
+
+            <td>
+                <input type="text" name="sellingPrice"
+                       th:value="${batch.product != null ? batch.product.sellingPrice : ''}"
+                       th:attr="form=${'update-batch-' + batch.id}"
+                       required style="width: 100px;"/>
+            </td>
+
+            <td>
+                <input type="text" name="purchasePrice"
+                       th:value="${batch.purchasePrice != null ? batch.purchasePrice : ''}"
+                       th:attr="form=${'update-batch-' + batch.id}"
+                       required style="width: 100px;"/>
+            </td>
+
+            <td th:text="${batch.product != null ? batch.product.discountPercent + '%' : '0%'}">0%</td>
+
+            <td>
+                <form th:id="${'update-batch-' + batch.id}"
+                      th:action="@{/dashboard/batches/{id}/update(id=${batch.id})}"
+                      method="post">
+                </form>
+                <button type="submit" th:attr="form=${'update-batch-' + batch.id}">Update</button>
+            </td>
+
+            <td>
+                <form th:if="${batch.product != null}"
+                      th:action="@{/dashboard/products/{id}/delete(id=${batch.product.id})}"
+                      method="post"
+                      onsubmit="return confirm('Are you sure you want to delete this product and all its batches?');">
+                    <button type="submit" class="delete-btn">Delete</button>
+                </form>
+            </td>
+
+            <td>
+                <form th:if="${batch.product != null}"
+                      th:action="@{/api/products/{id}/checkout(id=${batch.product.id})}"
+                      method="post"
+                      style="margin: 0; white-space: nowrap;">
+                    <input type="number" step="0.1" name="requestedQuantity"
+                           placeholder="Amount" required style="width: 55px;"/>
+                    <button type="submit"
+                            style="background-color: #d9534f; color: white; border: none; padding: 4px 8px; cursor: pointer;">
+                        Issue
+                    </button>
                 </form>
             </td>
         </tr>
         </tbody>
+
     </table>
-
-
 </div>
 
 <div id="add-product" class="tab-content">
@@ -235,7 +477,6 @@
 <div id="analytics" class="tab-content">
     <h2>Inventory Analytics</h2>
     <div class="analytics-container">
-
         <div class="kpi-row">
             <div class="kpi-card">
                 <h3>Total Product Types</h3>
@@ -256,7 +497,6 @@
             <div class="css-chart">
                 <div class="chart-row" th:each="product : ${products}">
                     <td th:text="${product.product != null ? product.product.name : 'Unknown'}">Product Name</td>
-
                     <div class="chart-bar-wrapper">
                         <div class="chart-bar"
                              th:classappend="${product.quantity < 5} ? 'low' : ''"
@@ -276,48 +516,30 @@
 </div>
 
 <script>
-    var originalRows = Array.from(document.querySelectorAll('#stockTableBody tr'));
-
     function openTab(evt, tabName) {
-        var i, tabcontent, tablinks;
-        tabcontent = document.getElementsByClassName("tab-content");
-        for (i = 0; i < tabcontent.length; i++) {
+        var tabcontent = document.getElementsByClassName("tab-content");
+        for (var i = 0; i < tabcontent.length; i++) {
             tabcontent[i].className = tabcontent[i].className.replace(" active", "");
         }
-        tablinks = document.getElementsByClassName("tab-link");
-        for (i = 0; i < tablinks.length; i++) {
+
+        var tablinks = document.getElementsByClassName("tab-link");
+        for (var i = 0; i < tablinks.length; i++) {
             tablinks[i].className = tablinks[i].className.replace(" active", "");
         }
+
         document.getElementById(tabName).className += " active";
         evt.currentTarget.className += " active";
     }
 
-    document.getElementById('dateInput').addEventListener('input', function (e) {
+    document.getElementById('dateInput').addEventListener('input', function () {
         var v = this.value.replace(/\D/g, '');
+
         if (v.length > 4 && v.length <= 6) {
             this.value = v.slice(0, 4) + '-' + v.slice(4);
         } else if (v.length > 6) {
             this.value = v.slice(0, 4) + '-' + v.slice(4, 6) + '-' + v.slice(6, 8);
         }
     });
-
-    function toggleGrouping(shouldGroup) {
-        var tbody = document.getElementById('stockTableBody');
-
-        document.getElementById('groupOnBtn').classList.toggle('active', shouldGroup);
-        document.getElementById('groupOffBtn').classList.toggle('active', !shouldGroup);
-
-        if (shouldGroup) {
-            var sortedRows = Array.from(originalRows).sort(function(a, b) {
-                return a.getAttribute('data-name').localeCompare(b.getAttribute('data-name'));
-            });
-            tbody.innerHTML = '';
-            sortedRows.forEach(function(row) { tbody.appendChild(row); });
-        } else {
-            tbody.innerHTML = '';
-            originalRows.forEach(function(row) { tbody.appendChild(row); });
-        }
-    }
 </script>
 
 </body>

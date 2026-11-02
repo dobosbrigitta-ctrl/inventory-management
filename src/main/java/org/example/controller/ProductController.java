@@ -1,3 +1,4 @@
+
 package org.example.controller;
 
 import org.example.entity.FoodBatch;
@@ -7,6 +8,7 @@ import org.example.repository.FoodBatchRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -42,11 +44,19 @@ public class ProductController {
             return ResponseEntity.badRequest().build();
         }
 
-        Product product = productRepository.findByNameAndBarcode(name, barcode)
+        System.out.println("INCOMING PRODUCT: [" + name + "] BARCODE: [" + barcode + "]");
+
+        productRepository.findFirstByNameAndBarcodeOrderByIdAsc(name.trim(), barcode.trim())
+                .ifPresentOrElse(
+                        existing -> System.out.println("EXISTING PRODUCT FOUND: ID=" + existing.getId()),
+                        () -> System.out.println("NO EXISTING PRODUCT FOUND")
+                );
+
+        Product product = productRepository.findFirstByNameAndBarcodeOrderByIdAsc(name.trim(), barcode.trim())
                 .orElseGet(() -> {
                     Product newProd = new Product();
-                    newProd.setName(name);
-                    newProd.setBarcode(barcode);
+                    newProd.setName(name.trim());
+                    newProd.setBarcode(barcode.trim());
                     newProd.setDiscountPercent(0.0);
                     return newProd;
                 });
@@ -86,13 +96,15 @@ public class ProductController {
     }
 
     @DeleteMapping("/{id}")
-    @org.springframework.transaction.annotation.Transactional
+    @Transactional
     public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
         if (!productRepository.existsById(id)) {
             return ResponseEntity.notFound().build();
         }
 
+        foodBatchRepository.deleteByProductId(id);
         productRepository.deleteById(id);
+
         return ResponseEntity.noContent().build();
     }
 
