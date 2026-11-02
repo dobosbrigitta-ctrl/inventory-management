@@ -18,9 +18,6 @@ public class Product {
     @Column(precision = 12, scale = 2)
     private BigDecimal sellingPrice;
 
-    @Column(precision = 12, scale = 2)
-    private BigDecimal purchasePrice;
-
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
@@ -67,14 +64,6 @@ public class Product {
 
     public void setSellingPrice(BigDecimal sellingPrice) {
         this.sellingPrice = sellingPrice;
-    }
-
-    public BigDecimal getPurchasePrice() {
-        return purchasePrice;
-    }
-
-    public void setPurchasePrice(BigDecimal purchasePrice) {
-        this.purchasePrice = purchasePrice;
     }
 
     @JsonIgnore
