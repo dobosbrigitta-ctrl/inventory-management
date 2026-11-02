@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -70,6 +71,17 @@ public class DashboardController {
 
                 foodBatchRepository.save(batch);
             });
+        }
+
+        return "redirect:/";
+    }
+
+    @PostMapping("/dashboard/products/{id}/delete")
+    @Transactional
+    public String deleteProductFromDashboard(@PathVariable Long id) {
+        if (productRepository.existsById(id)) {
+            foodBatchRepository.deleteByProductId(id);
+            productRepository.deleteById(id);
         }
 
         return "redirect:/";
