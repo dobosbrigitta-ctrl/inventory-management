@@ -32,7 +32,15 @@ public class ProductController {
             @RequestParam("name") String name,
             @RequestParam("barcode") String barcode,
             @RequestParam("quantity") BigDecimal quantity,
+            @RequestParam("sellingPrice") BigDecimal sellingPrice,
+            @RequestParam("purchasePrice") BigDecimal purchasePrice,
             @RequestParam("expirationDate") String expirationDate) {
+
+        if (quantity == null || quantity.compareTo(BigDecimal.ZERO) <= 0
+                || sellingPrice == null || sellingPrice.compareTo(BigDecimal.ZERO) < 0
+                || purchasePrice == null || purchasePrice.compareTo(BigDecimal.ZERO) < 0) {
+            return ResponseEntity.badRequest().build();
+        }
 
         Product product = productRepository.findByNameAndBarcode(name, barcode)
                 .orElseGet(() -> {
@@ -40,12 +48,16 @@ public class ProductController {
                     newProd.setName(name);
                     newProd.setBarcode(barcode);
                     newProd.setDiscountPercent(0.0);
-                    return productRepository.save(newProd);
+                    return newProd;
                 });
+
+        product.setSellingPrice(sellingPrice);
+        product = productRepository.save(product);
 
         FoodBatch batch = new FoodBatch();
         batch.setBatchNumber("BATCH-" + System.currentTimeMillis());
         batch.setQuantity(quantity);
+        batch.setPurchasePrice(purchasePrice);
         batch.setExpiryDate(LocalDate.parse(expirationDate));
         batch.setProduct(product);
 
@@ -76,13 +88,12 @@ public class ProductController {
     @DeleteMapping("/{id}")
     @org.springframework.transaction.annotation.Transactional
     public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
+        if (!productRepository.existsById(id)) {
+            return ResponseEntity.notFound().build();
+        }
 
-        return productRepository.findById(id)
-                .map(product -> {
-                    productRepository.delete(product);
-                    return ResponseEntity.noContent().<Void>build();
-                })
-                .orElse(ResponseEntity.notFound().build());
+        productRepository.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/{id}/checkout")
@@ -135,4 +146,3 @@ public class ProductController {
                         + " units using FEFO strategy.");
     }
 }
-

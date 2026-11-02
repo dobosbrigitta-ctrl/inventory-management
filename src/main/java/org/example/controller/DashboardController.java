@@ -15,8 +15,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
-import java.util.List;
+
 import java.math.BigDecimal;
+import java.util.List;
 
 @Controller
 public class DashboardController {
@@ -26,10 +27,11 @@ public class DashboardController {
     private final FoodBatchRepository foodBatchRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public DashboardController(UserRepository userRepository,
-                               ProductRepository productRepository,
-                               FoodBatchRepository foodBatchRepository,
-                               PasswordEncoder passwordEncoder) {
+    public DashboardController(
+            UserRepository userRepository,
+            ProductRepository productRepository,
+            FoodBatchRepository foodBatchRepository,
+            PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.productRepository = productRepository;
         this.foodBatchRepository = foodBatchRepository;
@@ -50,21 +52,26 @@ public class DashboardController {
             @PathVariable Long id,
             @RequestParam("newQuantity") BigDecimal newQuantity,
             @RequestParam("productName") String productName,
-            @RequestParam("barcode") String barcode) {
+            @RequestParam("barcode") String barcode,
+            @RequestParam("sellingPrice") BigDecimal sellingPrice,
+            @RequestParam("purchasePrice") BigDecimal purchasePrice) {
 
         if (newQuantity != null && newQuantity.compareTo(BigDecimal.ZERO) >= 0) {
             foodBatchRepository.findById(id).ifPresent(batch -> {
                 batch.setQuantity(newQuantity);
+                batch.setPurchasePrice(purchasePrice);
 
                 if (batch.getProduct() != null) {
                     batch.getProduct().setName(productName);
                     batch.getProduct().setBarcode(barcode);
+                    batch.getProduct().setSellingPrice(sellingPrice);
                     productRepository.save(batch.getProduct());
                 }
 
                 foodBatchRepository.save(batch);
             });
         }
+
         return "redirect:/";
     }
 
@@ -76,7 +83,10 @@ public class DashboardController {
     @PostMapping("/change-password")
     @Transactional
     public String changePassword(@RequestParam("newPassword") String newPassword) {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Object principal = SecurityContextHolder.getContext()
+                .getAuthentication()
+                .getPrincipal();
+
         String username;
 
         if (principal instanceof UserDetails) {
