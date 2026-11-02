@@ -3,11 +3,13 @@ package org.example.controller;
 import org.example.entity.FoodBatch;
 import org.example.entity.Product;
 import org.example.repository.ProductRepository;
-import org.example.model.ProductRequest;
 import org.example.repository.FoodBatchRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -29,8 +31,16 @@ public class ProductController {
     public ResponseEntity<Product> createProductWithBatch(
             @RequestParam("name") String name,
             @RequestParam("barcode") String barcode,
-            @RequestParam("quantity") double quantity,
+            @RequestParam("quantity") BigDecimal quantity,
+            @RequestParam("sellingPrice") BigDecimal sellingPrice,
+            @RequestParam("purchasePrice") BigDecimal purchasePrice,
             @RequestParam("expirationDate") String expirationDate) {
+
+        if (quantity == null || quantity.compareTo(BigDecimal.ZERO) <= 0
+                || sellingPrice == null || sellingPrice.compareTo(BigDecimal.ZERO) < 0
+                || purchasePrice == null || purchasePrice.compareTo(BigDecimal.ZERO) < 0) {
+            return ResponseEntity.badRequest().build();
+        }
 
         Product product = productRepository.findByNameAndBarcode(name, barcode)
                 .orElseGet(() -> {
@@ -38,13 +48,17 @@ public class ProductController {
                     newProd.setName(name);
                     newProd.setBarcode(barcode);
                     newProd.setDiscountPercent(0.0);
-                    return productRepository.save(newProd);
+                    return newProd;
                 });
+
+        product.setSellingPrice(sellingPrice);
+        product = productRepository.save(product);
 
         FoodBatch batch = new FoodBatch();
         batch.setBatchNumber("BATCH-" + System.currentTimeMillis());
         batch.setQuantity(quantity);
-        batch.setExpiryDate(java.time.LocalDate.parse(expirationDate));
+        batch.setPurchasePrice(purchasePrice);
+        batch.setExpiryDate(LocalDate.parse(expirationDate));
         batch.setProduct(product);
 
         foodBatchRepository.save(batch);
@@ -52,33 +66,13 @@ public class ProductController {
         return ResponseEntity.ok(product);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Product> updateProduct(@PathVariable Long id, @RequestBody ProductRequest request) {
-        return productRepository.findById(id)
-                .map(product -> {
-                    product.setName(request.getName());
-                    product.setBarcode(request.getBarcode());
-                    product.setDiscountPercent(request.getDiscountPercent());
-                    Product updatedProduct = productRepository.save(product);
-                    return ResponseEntity.ok(updatedProduct);
-                })
-                .orElse(ResponseEntity.notFound().build());
-
-
-    }@DeleteMapping("/{id}")
-    @org.springframework.transaction.annotation.Transactional
-    public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
-        return productRepository.findById(id)
-                .map(product -> {
-                    productRepository.delete(product);
-                    return ResponseEntity.noContent().<Void>build();
-                })
-                .orElse(ResponseEntity.notFound().build());
-    }
-
     @PatchMapping("/batches/{batchId}")
-    public ResponseEntity<FoodBatch> updateBatchQuantity(@PathVariable Long batchId, @RequestParam double newQuantity) {
-        if (newQuantity < 0) {
+    public ResponseEntity<FoodBatch> updateBatchQuantity(
+            @PathVariable Long batchId,
+            @RequestParam BigDecimal newQuantity) {
+
+        if (newQuantity == null ||
+                newQuantity.compareTo(BigDecimal.ZERO) < 0) {
             return ResponseEntity.badRequest().build();
         }
 
@@ -91,41 +85,64 @@ public class ProductController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @DeleteMapping("/{id}")
+    @org.springframework.transaction.annotation.Transactional
+    public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
+        if (!productRepository.existsById(id)) {
+            return ResponseEntity.notFound().build();
+        }
+
+        productRepository.deleteById(id);
+        return ResponseEntity.noContent().build();
+    }
+
     @PostMapping("/{id}/checkout")
     @org.springframework.transaction.annotation.Transactional
-    public ResponseEntity<String> checkOutGoods(@PathVariable Long id, @RequestParam("requestedQuantity") double requestedQuantity) {
-        if (requestedQuantity <= 0) {
-            return ResponseEntity.badRequest().body("Requested quantity must be greater than 0");
+    public ResponseEntity<String> checkOutGoods(
+            @PathVariable Long id,
+            @RequestParam("requestedQuantity") BigDecimal requestedQuantity) {
+
+        if (requestedQuantity == null ||
+                requestedQuantity.compareTo(BigDecimal.ZERO) <= 0) {
+            return ResponseEntity.badRequest()
+                    .body("Requested quantity must be greater than 0");
         }
 
-        List<FoodBatch> availableBatches = foodBatchRepository.findAvailableBatchesByProductOrderByExpiryAsc(id);
+        List<FoodBatch> availableBatches =
+                foodBatchRepository.findAvailableBatchesByProductOrderByExpiryAsc(id);
 
-        double totalAvailable = availableBatches.stream().mapToDouble(FoodBatch::getQuantity).sum();
-        if (totalAvailable < requestedQuantity) {
+        BigDecimal totalAvailable = availableBatches.stream()
+                .map(FoodBatch::getQuantity)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-            return ResponseEntity.badRequest().body("Not enough stock available! Requested: " + requestedQuantity + ", Available: " + totalAvailable);
+        if (totalAvailable.compareTo(requestedQuantity) < 0) {
+            return ResponseEntity.badRequest().body(
+                    "Not enough stock available! Requested: "
+                            + requestedQuantity + ", Available: " + totalAvailable);
         }
 
-        double remainingToDeduct = requestedQuantity;
+        BigDecimal remainingToDeduct = requestedQuantity;
 
         for (FoodBatch batch : availableBatches) {
-            if (remainingToDeduct <= 0) {
+
+            if (remainingToDeduct.compareTo(BigDecimal.ZERO) <= 0) {
                 break;
             }
 
-            if (batch.getQuantity() >= remainingToDeduct) {
-                batch.setQuantity(batch.getQuantity() - remainingToDeduct);
-                remainingToDeduct = 0;
+            if (batch.getQuantity().compareTo(remainingToDeduct) >= 0) {
+                batch.setQuantity(
+                        batch.getQuantity().subtract(remainingToDeduct));
+                remainingToDeduct = BigDecimal.ZERO;
             } else {
-                remainingToDeduct -= batch.getQuantity();
-                batch.setQuantity(0);
+                remainingToDeduct = remainingToDeduct.subtract(batch.getQuantity());
+                batch.setQuantity(BigDecimal.ZERO);
             }
 
             foodBatchRepository.save(batch);
         }
 
-        return ResponseEntity.ok("Successfully checked out " + requestedQuantity + " units using FEFO strategy.");
+        return ResponseEntity.ok(
+                "Successfully checked out " + requestedQuantity
+                        + " units using FEFO strategy.");
     }
-    }
-
-
+}

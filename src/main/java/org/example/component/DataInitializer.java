@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 
@@ -33,7 +35,7 @@ public class DataInitializer implements CommandLineRunner {
 
         FoodBatch batch1 = new FoodBatch();
         batch1.setBatchNumber("BATCH-INITIAL-01");
-        batch1.setQuantity(10.0);
+        batch1.setQuantity(new BigDecimal(10.0));
         batch1.setExpiryDate(LocalDate.now().plusDays(5));
         batch1.setProduct(product1);
         foodBatchRepository.save(batch1);
@@ -46,7 +48,7 @@ public class DataInitializer implements CommandLineRunner {
 
         FoodBatch batch2 = new FoodBatch();
         batch2.setBatchNumber("BATCH-INITIAL-02");
-        batch2.setQuantity(5.0);
+        batch2.setQuantity(new BigDecimal(5.0));
         batch2.setExpiryDate(LocalDate.now().plusDays(2));
         batch2.setProduct(product2);
         foodBatchRepository.save(batch2);

@@ -1,18 +1,24 @@
 package org.example.entity;
 
 import jakarta.persistence.*;
-
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
 public class FoodBatch {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String batchNumber;
-    private double quantity;
     private LocalDate expiryDate;
+
+    @Column(nullable = false, precision = 12, scale = 3)
+    private BigDecimal quantity;
+
+    @Column(precision = 12, scale = 2)
+    private BigDecimal purchasePrice;
 
     @ManyToOne
     @JoinColumn(name = "product_id")
@@ -37,12 +43,20 @@ public class FoodBatch {
         this.batchNumber = batchNumber;
     }
 
-    public double getQuantity() {
+    public BigDecimal getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(double quantity) {
+    public void setQuantity(BigDecimal quantity) {
         this.quantity = quantity;
+    }
+
+    public BigDecimal getPurchasePrice() {
+        return purchasePrice;
+    }
+
+    public void setPurchasePrice(BigDecimal purchasePrice) {
+        this.purchasePrice = purchasePrice;
     }
 
     public LocalDate getExpiryDate() {

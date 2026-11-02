@@ -3,6 +3,7 @@ package org.example.entity;
 import jakarta.persistence.*;
 import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.math.BigDecimal;
 
 @Entity
 public class Product {
@@ -13,6 +14,12 @@ public class Product {
     private String name;
     private String barcode;
     private double discountPercent;
+
+    @Column(precision = 12, scale = 2)
+    private BigDecimal sellingPrice;
+
+    @Column(precision = 12, scale = 2)
+    private BigDecimal purchasePrice;
 
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -52,6 +59,22 @@ public class Product {
 
     public void setDiscountPercent(double discountPercent) {
         this.discountPercent = discountPercent;
+    }
+
+    public BigDecimal getSellingPrice() {
+        return sellingPrice;
+    }
+
+    public void setSellingPrice(BigDecimal sellingPrice) {
+        this.sellingPrice = sellingPrice;
+    }
+
+    public BigDecimal getPurchasePrice() {
+        return purchasePrice;
+    }
+
+    public void setPurchasePrice(BigDecimal purchasePrice) {
+        this.purchasePrice = purchasePrice;
     }
 
     @JsonIgnore

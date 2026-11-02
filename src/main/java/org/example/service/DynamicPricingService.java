@@ -10,6 +10,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -25,7 +27,7 @@ public class DynamicPricingService {
         List<FoodBatch> allBatches = foodBatchRepository.findAll();
 
         for (FoodBatch batch : allBatches) {
-            if (batch.getExpiryDate() == null || batch.getQuantity() <= 0) {
+            if (batch.getExpiryDate() == null || batch.getQuantity().compareTo(BigDecimal.ZERO) <= 0) {
                 continue;
             }
 
