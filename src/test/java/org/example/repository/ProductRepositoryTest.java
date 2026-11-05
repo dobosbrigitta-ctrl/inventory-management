@@ -93,3 +93,4 @@ class ProductRepositoryTest {
         return entityManager.persist(batch);
     }
 }
+

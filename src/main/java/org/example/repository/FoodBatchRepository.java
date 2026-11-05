@@ -12,7 +12,10 @@ import java.util.List;
 public interface FoodBatchRepository extends JpaRepository<FoodBatch, Long> {
 
     @Query("SELECT b FROM FoodBatch b WHERE b.product.id = :productId AND b.quantity > 0 ORDER BY b.expiryDate ASC")
-    List<FoodBatch> findAvailableBatchesByProductOrderByExpiryAsc(Long productId);
+    List<FoodBatch> findInStockBatchesByProductOrderByExpiryAsc(@Param("productId") Long productId);
+
+    @Query("SELECT b FROM FoodBatch b WHERE b.product.id = :productId AND b.quantity > 0 AND b.expiryDate >= CURRENT_DATE ORDER BY b.expiryDate ASC")
+    List<FoodBatch> findUsableBatchesByProductOrderByExpiryAsc(@Param("productId") Long productId);
 
     List<FoodBatch> findByProductId(Long productId);
 

@@ -1,4 +1,3 @@
-
 package org.example.repository;
 
 import org.example.entity.FoodBatch;
@@ -26,18 +25,21 @@ class FoodBatchRepositoryTest {
     private TestEntityManager entityManager;
 
     @Test
-    void findAvailableBatchesByProductOrderByExpiryAsc_returnsOnlyAvailableBatchesInExpiryOrder() {
+    void findInStockBatchesByProductOrderByExpiryAsc_returnsOnlyPositiveQuantityBatchesInExpiryOrder() {
         Product product = createProduct("Milk", "12345");
+        Product anotherProduct = createProduct("Bread", "67890");
 
         createBatch(product, "BATCH-2", 10, 10);
         createBatch(product, "BATCH-1", 5, 3);
         createBatch(product, "BATCH-3", 0, 1);
+        createBatch(product, "BATCH-4", -2, 2);
+        createBatch(anotherProduct, "BREAD-1", 20, 1);
 
         entityManager.flush();
         entityManager.clear();
 
         List<FoodBatch> result =
-                foodBatchRepository.findAvailableBatchesByProductOrderByExpiryAsc(product.getId());
+                foodBatchRepository.findInStockBatchesByProductOrderByExpiryAsc(product.getId());
 
         assertThat(result)
                 .extracting(FoodBatch::getBatchNumber)
@@ -85,6 +87,41 @@ class FoodBatchRepositoryTest {
         assertThat(foodBatchRepository.findByProductId(secondProduct.getId()))
                 .extracting(FoodBatch::getBatchNumber)
                 .containsExactly("BREAD-1");
+    }
+    @Test
+    void findUsableBatchesByProductOrderByExpiryAsc_returnsEmptyList_whenNoUsableBatchesExist() {
+        Product product = createProduct("Milk", "12345");
+
+        createBatch(product, "EXPIRED-1", 10, -3);
+        createBatch(product, "EXPIRED-2", 5, -1);
+        createBatch(product, "EMPTY", 0, 5);
+
+        entityManager.flush();
+        entityManager.clear();
+
+        List<FoodBatch> result =
+                foodBatchRepository.findUsableBatchesByProductOrderByExpiryAsc(product.getId());
+
+        assertThat(result).isEmpty();
+    }
+    @Test
+    void findUsableBatchesByProductOrderByExpiryAsc_returnsOnlyNonExpiredBatches() {
+        Product product = createProduct("Milk", "12345");
+
+        createBatch(product, "EXPIRED", 10, -1);
+        createBatch(product, "EXPIRES-TODAY", 5, 0);
+        createBatch(product, "FUTURE", 8, 5);
+        createBatch(product, "EMPTY", 0, 3);
+
+        entityManager.flush();
+        entityManager.clear();
+
+        List<FoodBatch> result =
+                foodBatchRepository.findUsableBatchesByProductOrderByExpiryAsc(product.getId());
+
+        assertThat(result)
+                .extracting(FoodBatch::getBatchNumber)
+                .containsExactly("EXPIRES-TODAY", "FUTURE");
     }
 
     private Product createProduct(String name, String barcode) {

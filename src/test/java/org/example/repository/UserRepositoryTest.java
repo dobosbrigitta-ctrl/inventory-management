@@ -22,7 +22,7 @@ class UserRepositoryTest {
         UserEntity user = new UserEntity();
         user.setUsername("testuser");
         user.setPassword("TEST_ONLY_HASH");
-        user.setRole("ROLE_USER");
+        user.setRole("USER");
 
         UserEntity savedUser = userRepository.save(user);
 
@@ -37,7 +37,7 @@ class UserRepositoryTest {
         UserEntity user = new UserEntity();
         user.setUsername("john");
         user.setPassword("TEST_ONLY_HASH");
-        user.setRole("ROLE_USER");
+        user.setRole("USER");
 
         userRepository.save(user);
 

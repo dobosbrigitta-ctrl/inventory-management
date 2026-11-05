@@ -6,25 +6,21 @@ import org.example.repository.FoodBatchRepository;
 import org.example.repository.ProductRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
-import java.time.LocalDate;
+import org.springframework.test.web.servlet.MockMvc;
+
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 
 @SpringBootTest(properties = "spring.jpa.hibernate.ddl-auto=create-drop")
 @AutoConfigureMockMvc
@@ -62,6 +58,7 @@ class ProductControllerTest {
                 .andExpect(jsonPath("$[0].barcode").value("123456789"))
                 .andExpect(jsonPath("$[0].sellingPrice").value(2.50));
     }
+
     @Test
     @WithMockUser
     void createProductWithBatch_shouldSaveProductAndBatch() throws Exception {
@@ -110,7 +107,6 @@ class ProductControllerTest {
                 .isEmpty();
     }
 
-
     @Test
     @WithMockUser
     void deleteProduct_shouldDeleteProductAndBatches() throws Exception {
@@ -128,7 +124,7 @@ class ProductControllerTest {
 
         FoodBatch batch = new FoodBatch();
         batch.setBatchNumber("TEST-BATCH-001");
-        batch.setExpiryDate(java.time.LocalDate.of(2027, 12, 31));
+        batch.setExpiryDate(LocalDate.of(2027, 12, 31));
         batch.setQuantity(new BigDecimal("10"));
         batch.setPurchasePrice(new BigDecimal("3.00"));
         batch.setProduct(savedProduct);
@@ -145,7 +141,6 @@ class ProductControllerTest {
         assertThat(foodBatchRepository.findAll()).isEmpty();
     }
 
-
     @Test
     @WithMockUser
     void deleteProduct_shouldReturnNotFoundWhenProductDoesNotExist() throws Exception {
@@ -154,7 +149,6 @@ class ProductControllerTest {
                         .with(SecurityMockMvcRequestPostProcessors.csrf()))
                 .andExpect(status().isNotFound());
     }
-
 
     @Test
     @WithMockUser
@@ -170,7 +164,7 @@ class ProductControllerTest {
 
         FoodBatch batch = new FoodBatch();
         batch.setBatchNumber("PATCH-BATCH-001");
-        batch.setExpiryDate(java.time.LocalDate.of(2027, 12, 31));
+        batch.setExpiryDate(LocalDate.of(2027, 12, 31));
         batch.setQuantity(new BigDecimal("10"));
         batch.setPurchasePrice(new BigDecimal("3.00"));
         batch.setProduct(savedProduct);
@@ -208,7 +202,6 @@ class ProductControllerTest {
                         .param("newQuantity", "-5"))
                 .andExpect(status().isBadRequest());
     }
-
 
     @Test
     @WithMockUser
@@ -290,6 +283,54 @@ class ProductControllerTest {
     }
 
     @Test
+    void getAllProducts_shouldReturnUnauthorizedWhenUserIsNotAuthenticated()
+            throws Exception {
+
+        mockMvc.perform(get("/api/products")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void createProduct_shouldReturnUnauthorizedWhenUserIsNotAuthenticated()
+            throws Exception {
+
+        mockMvc.perform(post("/api/products")
+                        .with(SecurityMockMvcRequestPostProcessors.csrf())
+                        .param("name", "Unauthorized Product")
+                        .param("barcode", "999888777")
+                        .param("quantity", "10")
+                        .param("sellingPrice", "3.50")
+                        .param("purchasePrice", "2.00")
+                        .param("expirationDate", "2027-12-31"))
+                .andExpect(status().isUnauthorized());
+
+        assertThat(productRepository
+                .findFirstByNameAndBarcodeOrderByIdAsc(
+                        "Unauthorized Product", "999888777"))
+                .isEmpty();
+    }
+
+    @Test
+    @WithMockUser
+    void createProductWithBatch_shouldReturnBadRequestWhenNameIsMissing()
+            throws Exception {
+
+        long productsBefore = productRepository.count();
+
+        mockMvc.perform(post("/api/products")
+                        .with(SecurityMockMvcRequestPostProcessors.csrf())
+                        .param("barcode", "123456789")
+                        .param("quantity", "10")
+                        .param("sellingPrice", "3.50")
+                        .param("purchasePrice", "2.00")
+                        .param("expirationDate", "2027-12-31"))
+                .andExpect(status().isBadRequest());
+
+        assertThat(productRepository.count()).isEqualTo(productsBefore);
+    }
+
+    @Test
     @WithMockUser
     void checkOutGoods_shouldReturnBadRequestWhenQuantityIsNegative() throws Exception {
 
@@ -300,7 +341,4 @@ class ProductControllerTest {
                 .andExpect(content().string(
                         "Requested quantity must be greater than 0"));
     }
-
-
-
 }

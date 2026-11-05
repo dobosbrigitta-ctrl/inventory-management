@@ -122,7 +122,7 @@ public class ProductController {
         }
 
         List<FoodBatch> availableBatches =
-                foodBatchRepository.findAvailableBatchesByProductOrderByExpiryAsc(id);
+                foodBatchRepository.findInStockBatchesByProductOrderByExpiryAsc(id);
 
         BigDecimal totalAvailable = availableBatches.stream()
                 .map(FoodBatch::getQuantity)

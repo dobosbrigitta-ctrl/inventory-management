@@ -1,3 +1,4 @@
+
 package org.example.service;
 
 import org.example.entity.UserEntity;
@@ -21,21 +22,19 @@ class CustomUserDetailsServiceTest {
     @Mock
     private UserRepository userRepository;
 
-    @Mock
-    private UserEntity userEntity;
-
     @InjectMocks
     private CustomUserDetailsService customUserDetailsService;
 
     @Test
     void loadUserByUsername_shouldReturnUserDetails_whenUserExists() {
 
+        UserEntity userEntity = new UserEntity();
+        userEntity.setUsername("admin");
+        userEntity.setPassword("encodedPassword");
+        userEntity.setRole("ADMIN");
+
         when(userRepository.findByUsername("admin"))
                 .thenReturn(Optional.of(userEntity));
-
-        when(userEntity.getUsername()).thenReturn("admin");
-        when(userEntity.getPassword()).thenReturn("encodedPassword");
-        when(userEntity.getRole()).thenReturn("ADMIN");
 
         UserDetails result =
                 customUserDetailsService.loadUserByUsername("admin");
