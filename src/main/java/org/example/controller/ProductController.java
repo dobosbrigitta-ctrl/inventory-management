@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.transaction.annotation.Transactional;
+import java.time.LocalDate;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -121,7 +122,7 @@ public class ProductController {
         }
 
         List<FoodBatch> availableBatches =
-                foodBatchRepository.findAvailableBatchesByProductOrderByExpiryAsc(id);
+                foodBatchRepository.findInStockBatchesByProductOrderByExpiryAsc(id);
 
         BigDecimal totalAvailable = availableBatches.stream()
                 .map(FoodBatch::getQuantity)

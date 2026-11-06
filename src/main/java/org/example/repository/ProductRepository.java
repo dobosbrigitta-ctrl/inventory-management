@@ -12,6 +12,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     Optional<Product> findFirstByNameAndBarcodeOrderByIdAsc(String name, String barcode);
 
-    @Query("SELECT DISTINCT p FROM Product p JOIN p.batches b WHERE p.discountPercent > 0 AND b.quantity > 0")
+    @Query("SELECT DISTINCT p FROM Product p JOIN p.batches b WHERE p.discountPercent > 0 AND b.quantity > 0 AND (b.expiryDate IS NULL OR b.expiryDate >= CURRENT_DATE)")
     List<Product> findRescueProducts();
 }
