@@ -256,4 +256,47 @@ class DynamicPricingServiceTest {
 
         verify(productRepository).saveAll(List.of(product, secondProduct));
     }
+
+    @Test
+    void updatePricing_shouldGroupBatchesByProductAndUseEarliestExpiry() {
+        Product secondProduct = new Product();
+        secondProduct.setId(2L);
+
+        FoodBatch firstProductLaterBatch = new FoodBatch();
+        firstProductLaterBatch.setProduct(product);
+        firstProductLaterBatch.setQuantity(new BigDecimal("5"));
+        firstProductLaterBatch.setExpiryDate(LocalDate.now().plusDays(10));
+
+        FoodBatch secondProductEarliestBatch = new FoodBatch();
+        secondProductEarliestBatch.setProduct(secondProduct);
+        secondProductEarliestBatch.setQuantity(new BigDecimal("8"));
+        secondProductEarliestBatch.setExpiryDate(LocalDate.now().plusDays(1));
+
+        FoodBatch firstProductEarliestBatch = new FoodBatch();
+        firstProductEarliestBatch.setProduct(product);
+        firstProductEarliestBatch.setQuantity(new BigDecimal("10"));
+        firstProductEarliestBatch.setExpiryDate(LocalDate.now().plusDays(5));
+
+        FoodBatch secondProductLaterBatch = new FoodBatch();
+        secondProductLaterBatch.setProduct(secondProduct);
+        secondProductLaterBatch.setQuantity(new BigDecimal("12"));
+        secondProductLaterBatch.setExpiryDate(LocalDate.now().plusDays(15));
+
+        when(productRepository.findAll())
+                .thenReturn(List.of(product, secondProduct));
+
+        when(foodBatchRepository.findAll()).thenReturn(List.of(
+                firstProductLaterBatch,
+                secondProductEarliestBatch,
+                firstProductEarliestBatch,
+                secondProductLaterBatch
+        ));
+
+        dynamicPricingService.updatePricing();
+
+        assertEquals(30.0, product.getDiscountPercent());
+        assertEquals(50.0, secondProduct.getDiscountPercent());
+
+        verify(productRepository).saveAll(List.of(product, secondProduct));
+    }
 }

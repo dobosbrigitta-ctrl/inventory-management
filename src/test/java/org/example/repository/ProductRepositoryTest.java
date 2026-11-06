@@ -50,6 +50,7 @@ class ProductRepositoryTest {
         Product anotherRescueProduct = createProduct("Rescue bread", "222", 20);
         Product noDiscountProduct = createProduct("Regular milk", "333", 0);
         Product noStockProduct = createProduct("Empty product", "444", 15);
+        Product expiredOnlyProduct = createProduct("Expired milk", "555", 25);
 
         createBatch(rescueProduct, "BATCH-1", "5");
         createBatch(rescueProduct, "BATCH-2", "3");
@@ -59,6 +60,8 @@ class ProductRepositoryTest {
         createBatch(noDiscountProduct, "BATCH-4", "5");
 
         createBatch(noStockProduct, "BATCH-5", "0");
+
+        createBatch(expiredOnlyProduct, "EXPIRED-1", "5", -1);
 
         entityManager.flush();
         entityManager.clear();
@@ -83,11 +86,24 @@ class ProductRepositoryTest {
         return entityManager.persist(product);
     }
 
-    private FoodBatch createBatch(Product product, String batchNumber, String quantity) {
+    private FoodBatch createBatch(
+            Product product,
+            String batchNumber,
+            String quantity) {
+
+        return createBatch(product, batchNumber, quantity, 3);
+    }
+
+    private FoodBatch createBatch(
+            Product product,
+            String batchNumber,
+            String quantity,
+            int expiryDays) {
+
         FoodBatch batch = new FoodBatch();
         batch.setProduct(product);
         batch.setBatchNumber(batchNumber);
-        batch.setExpiryDate(LocalDate.now().plusDays(3));
+        batch.setExpiryDate(LocalDate.now().plusDays(expiryDays));
         batch.setQuantity(new BigDecimal(quantity));
 
         return entityManager.persist(batch);
