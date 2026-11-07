@@ -5,24 +5,33 @@ import org.example.entity.FoodBatch;
 import org.example.entity.Product;
 import org.example.repository.FoodBatchRepository;
 import org.example.repository.ProductRepository;
+import org.example.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
+import org.example.repository.UserRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.example.entity.UserEntity;
+import org.springframework.security.core.userdetails.User;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 
 @SpringBootTest(properties = "spring.jpa.hibernate.ddl-auto=create-drop")
 @AutoConfigureMockMvc
@@ -37,6 +46,12 @@ class DashboardControllerTest {
 
     @Autowired
     private FoodBatchRepository foodBatchRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Test
     @WithMockUser
@@ -102,7 +117,7 @@ class DashboardControllerTest {
         FoodBatch savedBatch = foodBatchRepository.save(batch);
 
         mockMvc.perform(post("/dashboard/batches/" + savedBatch.getId() + "/update")
-                        .with(SecurityMockMvcRequestPostProcessors.csrf())
+                        .with(csrf())
                         .param("newQuantity", "20")
                         .param("productName", "Updated Product")
                         .param("barcode", "222222222")
@@ -145,7 +160,7 @@ class DashboardControllerTest {
         foodBatchRepository.save(batch);
 
         mockMvc.perform(post("/dashboard/products/" + savedProduct.getId() + "/delete")
-                        .with(SecurityMockMvcRequestPostProcessors.csrf()))
+                        .with(csrf()))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/"));
 
@@ -163,4 +178,79 @@ class DashboardControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(view().name("change-password"));
     }
+    @Test
+    void changePassword_shouldUpdatePasswordForUserDetailsPrincipal() throws Exception {
+
+        UserEntity user = new UserEntity();
+        user.setUsername("password-test-user");
+        user.setPassword(passwordEncoder.encode("OldTestPassword123!"));
+        user.setRole("ROLE_USER");
+
+        userRepository.save(user);
+
+        mockMvc.perform(post("/change-password")
+                        .with(user(User.withUsername("password-test-user")
+                                .password("OldTestPassword123!")
+                                .roles("USER")
+                                .build()))
+                        .with(csrf())
+                        .param("newPassword", "NewTestPassword123!"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/change-password?success"));
+
+        UserEntity updatedUser = userRepository.findByUsername("password-test-user")
+                .orElseThrow();
+
+        assertTrue(passwordEncoder.matches(
+                "NewTestPassword123!",
+                updatedUser.getPassword()
+        ));
+    }
+
+
+    @Test
+    @WithMockUser
+    void updateBatchFromWeb_shouldNotUpdateWhenQuantityIsNegative() throws Exception {
+
+        Product product = new Product();
+        product.setName("Test Product");
+        product.setBarcode("111111111");
+        product.setSellingPrice(new BigDecimal("5.00"));
+        product.setDiscountPercent(0.0);
+
+        Product savedProduct = productRepository.save(product);
+
+        FoodBatch batch = new FoodBatch();
+        batch.setBatchNumber("NEGATIVE-001");
+        batch.setExpiryDate(LocalDate.of(2027, 12, 31));
+        batch.setQuantity(new BigDecimal("10"));
+        batch.setPurchasePrice(new BigDecimal("3.00"));
+        batch.setProduct(savedProduct);
+
+        FoodBatch savedBatch = foodBatchRepository.save(batch);
+
+        mockMvc.perform(post("/dashboard/batches/" + savedBatch.getId() + "/update")
+                        .with(csrf())
+                        .param("newQuantity", "-5")
+                        .param("productName", "Changed Product")
+                        .param("barcode", "999999999")
+                        .param("sellingPrice", "8.50")
+                        .param("purchasePrice", "4.00"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/"));
+
+        FoodBatch unchangedBatch = foodBatchRepository.findById(savedBatch.getId())
+                .orElseThrow();
+
+        Product unchangedProduct = productRepository.findById(savedProduct.getId())
+                .orElseThrow();
+
+        assertThat(unchangedBatch.getQuantity()).isEqualByComparingTo("10");
+        assertThat(unchangedBatch.getPurchasePrice()).isEqualByComparingTo("3.00");
+        assertThat(unchangedProduct.getName()).isEqualTo("Test Product");
+        assertThat(unchangedProduct.getBarcode()).isEqualTo("111111111");
+        assertThat(unchangedProduct.getSellingPrice()).isEqualByComparingTo("5.00");
+    }
+
+
 }
