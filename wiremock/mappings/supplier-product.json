@@ -1,0 +1,19 @@
+﻿{
+  "request": {
+    "method": "GET",
+    "url": "/api/products/SUP-1001"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "supplierProductId": "SUP-1001",
+      "name": "Organic Milk",
+      "purchasePrice": 1.25,
+      "availableQuantity": 150.000,
+      "supplierName": "Demo Supplier Ltd."
+    }
+  }
+}
