@@ -91,11 +91,16 @@ Testing technologies and approaches:
 
 ### Main Dashboard
 
-![Inventory Management Dashboard](images/dashboard.png)
+![Inventory Management Dashboard](images/abc1jpg.jpg)
 
 ### Inventory Management
 
-![Inventory Management Interface](images/inventory-management.png)
+![Inventory Management Interface](images/abc2.jpg)
+
+### Swagger UI
+
+![Swagger UI](images/abc3.jpg)
+
 
 ## Acknowledgements
 
