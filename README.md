@@ -91,7 +91,7 @@ Testing technologies and approaches:
 
 ### Main Dashboard
 
-![Inventory Management Dashboard](images/abc1jpg.jpg)
+![Inventory Management Dashboard](images/.abc1jpg.jpg)
 
 ### Inventory Management
 
