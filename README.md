@@ -1,10 +1,12 @@
+
 # Inventory Management
 
-A clean and responsive web application for real-time product inventory tracking. It features an intuitive split-screen dashboard backed by a relational database, supporting multi-criteria table sorting, smart batch grouping, low-stock visual alerts, and instant quantity adjustments through a pop-up modal interface.
+A clean and responsive web application for product inventory tracking. It features an intuitive split-screen dashboard backed by a relational database, supporting multi-criteria table sorting, smart batch grouping, low-stock visual alerts, and instant quantity adjustments through a pop-up modal interface.
 
-The project demonstrates practical experience in Java backend development, REST API design, software integration, database management, and cloud database migration.
+The project demonstrates practical experience in Java backend development, REST API design, software integration, database management, automated testing, and cloud database migration.
 
 ---
+
 ## Technological Background
 
 The application uses a decoupled architecture, separating the backend server from the asynchronous frontend interface.
@@ -29,7 +31,7 @@ The application uses a decoupled architecture, separating the backend server fro
 
 The application follows an integration-oriented approach, using REST endpoints and asynchronous HTTP communication to connect its frontend and backend components.
 
-The backend also includes configurable supplier API connectivity, allowing the supplier service endpoint to be managed through external application configuration.
+The backend also includes configurable supplier API connectivity, allowing the supplier service endpoint to be managed through external application configuration. This provides a foundation for connecting external supplier services without hardcoding endpoint addresses.
 
 Key integration concepts include:
 
@@ -37,7 +39,7 @@ Key integration concepts include:
 - HTTP request and response handling.
 - JSON-based data exchange.
 - Frontend–backend integration.
-- Configurable external service endpoints.
+- External service endpoint configuration.
 - Separation of application components and responsibilities.
 
 ### Database & Cloud Technologies
@@ -54,13 +56,13 @@ This provided practical experience with:
 - ORM-based data persistence.
 - Cloud-hosted database management.
 
-The database is hosted on Microsoft Azure. The application source code and application deployment yet to be hosted on Azure.
+The database is hosted on Microsoft Azure. The application source code and application deployment have not yet been hosted on Azure.
 
 ---
 
 ## Key Features
 
-- **Real-Time Inventory Tracking:** Monitor product quantities and inventory levels through a centralized dashboard.
+- **Inventory Tracking:** Monitor product quantities and inventory levels through a centralized dashboard.
 - **Batch Management:** Organize inventory into batches and track expiration dates.
 - **Dynamic Pricing:** Automatically calculate discounts based on product expiration dates.
 - **Low-Stock Alerts:** Visually identify products that require restocking.
@@ -71,18 +73,31 @@ The database is hosted on Microsoft Azure. The application source code and appli
 
 ---
 
-## Getting Started
+## Testing
 
-The application is designed to run locally with a configured Microsoft Azure SQL Database connection.
+The application includes automated tests covering backend functionality, REST API endpoints, database repositories, and security configurations.
 
-1. Clone the repository.
-2. Configure the database connection and authentication.
-3. Set the required environment variables and application properties.
-4. Run the Spring Boot application.
-5. Open the application in your browser at `http://localhost:8081`.
+Testing technologies and approaches:
+
+- **JUnit 5** – Unit testing.
+- **Mockito** – Dependency mocking and isolated service testing.
+- **MockMvc** – REST controller and HTTP endpoint testing.
+- **Spring Security Testing** – Authentication and authorization testing.
+- **JPA Repository Testing** – Database persistence and query validation.
 
 ---
 
+## Screenshots
+
+### Main Dashboard
+
+![Inventory Management Dashboard](images/dashboard.png)
+
+### Inventory Management
+
+![Inventory Management Interface](images/inventory-management.png)
+
 ## Acknowledgements
 
-Developed as a hands-on portfolio project to strengthen practical skills in Java backend development, Spring Boot, REST API design, software integration, HTTP communication, JSON data exchange, relational database management, database migration, frontend integration, software security, and cloud database technologies.
+Developed as a hands-on portfolio project to strengthen practical skills in Java backend development, Spring Boot, REST API design, software integration, HTTP communication, JSON data exchange, relational database management, database migration, frontend integration, software security, automated testing, and cloud database technologies.
+
